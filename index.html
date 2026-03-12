@@ -3,59 +3,1070 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>급여 기반 가계부</title>
-  <link rel="stylesheet" href="style.css" />
-  <meta name="theme-color" content="#0f172a" />
+  <title>급여월 가계부</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --line: #e6ebf2;
+      --text: #1f2937;
+      --sub: #6b7280;
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --danger: #dc2626;
+      --good: #059669;
+      --chip: #eef4ff;
+      --shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .app {
+      max-width: 440px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding-bottom: 92px;
+    }
+    .page {
+      display: none;
+      padding: 16px;
+    }
+    .page.active { display: block; }
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%);
+      color: #fff;
+    }
+    .hero .period-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .period-center {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      background: rgba(255,255,255,0.14);
+      border-radius: 999px;
+      padding: 7px 10px;
+    }
+    .hero-btn, .ghost-btn, .small-btn, .danger-btn, .primary-btn {
+      border: none;
+      cursor: pointer;
+      border-radius: 12px;
+      font-size: 13px;
+    }
+    .hero-btn {
+      width: 34px;
+      height: 34px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+    }
+    .ghost-btn {
+      padding: 8px 10px;
+      background: #eef2ff;
+      color: var(--primary-dark);
+    }
+    .small-btn {
+      padding: 8px 10px;
+      background: #eff6ff;
+      color: var(--primary-dark);
+    }
+    .danger-btn {
+      padding: 8px 10px;
+      background: #fee2e2;
+      color: var(--danger);
+    }
+    .primary-btn {
+      width: 100%;
+      padding: 13px 14px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+    }
+    .title {
+      font-size: 14px;
+      opacity: 0.92;
+      margin-bottom: 8px;
+    }
+    .money-lg {
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+    .hero-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .meta-box {
+      background: rgba(255,255,255,0.12);
+      padding: 12px;
+      border-radius: 14px;
+    }
+    .meta-label { font-size: 12px; opacity: 0.85; }
+    .meta-value { font-size: 18px; font-weight: 700; margin-top: 4px; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .section-title { font-size: 17px; font-weight: 800; }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .row:last-child { border-bottom: none; }
+    .label { color: var(--sub); font-size: 14px; }
+    .value { font-weight: 700; }
+    .subtle { color: var(--sub); font-size: 12px; }
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      background: var(--chip);
+      color: var(--primary-dark);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .budget-item {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .budget-item:last-child { border-bottom: none; }
+    .budget-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .budget-bar {
+      height: 8px;
+      width: 100%;
+      background: #edf2f7;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .budget-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #60a5fa, #2563eb);
+      border-radius: 999px;
+    }
+    .fab-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .fab {
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+      text-align: center;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .tabs {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      max-width: 440px;
+      margin: 0 auto;
+      z-index: 20;
+    }
+    .tab {
+      padding: 12px 6px 14px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--sub);
+      cursor: pointer;
+    }
+    .tab.active { color: var(--primary); font-weight: 800; }
+    .list-card {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      margin-bottom: 10px;
+    }
+    .list-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .item-title { font-weight: 800; }
+    .item-desc { font-size: 12px; color: var(--sub); margin-top: 3px; }
+    .badge {
+      padding: 5px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .badge.plan { background: #eef2ff; color: #3730a3; }
+    .badge.card { background: #ecfeff; color: #0f766e; }
+    .badge.actual { background: #ecfdf5; color: #166534; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .empty { text-align: center; color: var(--sub); padding: 24px 10px; font-size: 14px; }
+    .asset-box {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    .report-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .report-num { font-size: 22px; font-weight: 800; margin-top: 4px; }
+    label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #d7dce5;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+      margin-bottom: 12px;
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.45);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 50;
+    }
+    .modal.show { display: flex; }
+    .sheet {
+      background: #fff;
+      width: 100%;
+      max-width: 440px;
+      border-radius: 24px 24px 0 0;
+      padding: 18px 16px 24px;
+      max-height: 88vh;
+      overflow: auto;
+    }
+    .sheet-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .sheet-title { font-size: 18px; font-weight: 800; }
+    .inline-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .help {
+      font-size: 12px;
+      color: var(--sub);
+      margin-top: -8px;
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 <body>
   <div class="app">
-    <header class="card header-card">
-      <div class="period" id="budgetPeriod">급여월 기간</div>
-      <h1 id="budgetTitle">급여월 가계부</h1>
-      <p class="label">남은 사용 가능 금액</p>
-      <div class="big-number" id="remainingAmount">0원</div>
-      <div class="sub-number" id="remainingDetail">사용 가능 예산 0원</div>
-    </header>
-
-    <section class="card form-card">
-      <h2>기본 설정</h2>
-
-      <label for="salary">실수령 월급</label>
-      <input type="number" id="salary" placeholder="예: 3150000" />
-
-      <label for="saving">선저축</label>
-      <input type="number" id="saving" placeholder="예: 1500000" />
-
-      <label for="fixed">고정지출</label>
-      <input type="number" id="fixed" placeholder="예: 725000" />
-
-      <label for="spent">현재까지 실제 지출</label>
-      <input type="number" id="spent" placeholder="예: 148500" />
-
-      <button id="saveBtn">저장하기</button>
-    </section>
-
-    <section class="card summary-card">
-      <h2>요약</h2>
-      <div class="summary-row">
-        <span>사용 가능 예산</span>
-        <strong id="availableBudget">0원</strong>
-      </div>
-      <div class="summary-row">
-        <span>현재까지 지출</span>
-        <strong id="currentSpent">0원</strong>
-      </div>
-      <div class="summary-row">
-        <span>남은 예산</span>
-        <strong id="remainingBudget">0원</strong>
-      </div>
-      <div class="summary-row">
-        <span>하루 사용 가능 금액</span>
-        <strong id="dailyBudget">0원</strong>
-      </div>
-    </section>
+    <section class="page active" id="page-home"></section>
+    <section class="page" id="page-ledger"></section>
+    <section class="page" id="page-assets"></section>
+    <section class="page" id="page-reports"></section>
+    <section class="page" id="page-settings"></section>
   </div>
 
-  <script src="script.js"></script>
+  <nav class="tabs">
+    <div class="tab active" data-page="home">홈</div>
+    <div class="tab" data-page="ledger">내역</div>
+    <div class="tab" data-page="assets">자산</div>
+    <div class="tab" data-page="reports">리포트</div>
+    <div class="tab" data-page="settings">설정</div>
+  </nav>
+
+  <div class="modal" id="modal">
+    <div class="sheet">
+      <div class="sheet-head">
+        <div class="sheet-title" id="modalTitle">입력</div>
+        <button class="ghost-btn" onclick="closeModal()">닫기</button>
+      </div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    const CATEGORY_TREE = {
+      "수입": {
+        "월급": [],
+        "수당": ["통계활동비", "정근수당", "명절수당", "출장비", "성과급"],
+        "기타": []
+      },
+      "저축/투자": {
+        "현금": ["입출금통장", "예금", "적금", "비상금", "경조사"],
+        "주식": ["ISA", "나무증권", "토스증권"],
+        "금": [],
+        "코인": ["비트코인", "이더리움", "기타"],
+        "기타": ["연금저축", "주택청약", "보증금"]
+      },
+      "고정지출": {
+        "주거": ["대출이자", "관리비", "공과금"],
+        "통신": ["휴대폰", "인터넷"],
+        "보험": [],
+        "구독": [],
+        "교통": [],
+        "기타": []
+      },
+      "변동지출": {
+        "식비": ["외식", "배달", "장보기", "구내식당", "기타"],
+        "카페/간식": ["커피", "빵/디저트", "기타"],
+        "쇼핑": ["의류", "신발", "잡화", "화장품", "기타"],
+        "생활용품": [],
+        "취미/여가": [],
+        "모임/경조사": [],
+        "미용": ["헤어", "뷰티", "기타"],
+        "건강": [],
+        "기타": []
+      },
+      "카드사용": {
+        "식비": ["외식", "배달", "장보기", "구내식당", "기타"],
+        "카페/간식": ["커피", "빵/디저트", "기타"],
+        "쇼핑": ["의류", "신발", "잡화", "화장품", "기타"],
+        "생활용품": [],
+        "취미/여가": [],
+        "모임/경조사": [],
+        "미용": ["헤어", "뷰티", "기타"],
+        "건강": [],
+        "기타": []
+      },
+      "자산": {
+        "현금": ["입출금통장", "예금", "적금", "비상금", "경조사"],
+        "주식": ["ISA", "나무증권", "토스증권"],
+        "금": [],
+        "코인": ["비트코인", "이더리움", "기타"],
+        "기타": ["연금저축", "주택청약", "보증금"]
+      },
+      "부채": {
+        "카드결제예정": [],
+        "대출": [],
+        "마이너스통장": [],
+        "기타": []
+      }
+    };
+
+    const APP_KEY = 'salary-budget-master-v1';
+    const DEFAULT_STATE = {
+      salaryDay: 25,
+      monthOffset: 0,
+      periods: {},
+      items: [],
+      assets: [],
+      settings: { theme: 'light' }
+    };
+
+    function loadState() {
+      const raw = localStorage.getItem(APP_KEY);
+      if (!raw) {
+        const seeded = structuredClone(DEFAULT_STATE);
+        const current = getPeriodKey(0, seeded.salaryDay);
+        seeded.assets = seedAssets();
+        seeded.periods[current] = getDefaultPeriodMeta(0, seeded.salaryDay);
+        return seeded;
+      }
+      const parsed = JSON.parse(raw);
+      parsed.assets = parsed.assets?.length ? parsed.assets : seedAssets();
+      return parsed;
+    }
+
+    let state = loadState();
+
+    function saveState() {
+      localStorage.setItem(APP_KEY, JSON.stringify(state));
+    }
+
+    function uid() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
+
+    function seedAssets() {
+      const list = [];
+      Object.entries(CATEGORY_TREE['자산']).forEach(([category, subs]) => {
+        if (subs.length) {
+          subs.forEach(sub => list.push({ id: uid(), category, subcategory: sub, amount: 0 }));
+        } else {
+          list.push({ id: uid(), category, subcategory: '', amount: 0 });
+        }
+      });
+      return list;
+    }
+
+    function formatMoney(value) {
+      return `${Math.round(Number(value || 0)).toLocaleString('ko-KR')}원`;
+    }
+
+    function formatDate(date) {
+      const y = date.getFullYear();
+      const m = date.getMonth() + 1;
+      const d = date.getDate();
+      return `${y}.${m}.${d}`;
+    }
+
+    function addMonths(base, months) {
+      return new Date(base.getFullYear(), base.getMonth() + months, base.getDate());
+    }
+
+    function getPeriodBase(offset, salaryDay) {
+      const now = new Date();
+      const currentBaseMonth = now.getDate() >= salaryDay ? 0 : -1;
+      return addMonths(new Date(now.getFullYear(), now.getMonth(), salaryDay), currentBaseMonth + offset);
+    }
+
+    function getPeriodKey(offset, salaryDay) {
+      const start = getPeriodBase(offset, salaryDay);
+      return `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    function getDefaultPeriodMeta(offset, salaryDay) {
+      const start = getPeriodBase(offset, salaryDay);
+      const end = new Date(start.getFullYear(), start.getMonth() + 1, salaryDay - 1);
+      return {
+        title: `${start.getFullYear()}년 ${start.getMonth() + 1}월 급여월`,
+        start: toInputDate(start),
+        end: toInputDate(end)
+      };
+    }
+
+    function toInputDate(date) {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }
+
+    function fromInputDate(value) {
+      return new Date(value + 'T00:00:00');
+    }
+
+    function getCurrentPeriodMeta() {
+      const key = getPeriodKey(state.monthOffset, state.salaryDay);
+      if (!state.periods[key]) state.periods[key] = getDefaultPeriodMeta(state.monthOffset, state.salaryDay);
+      return { key, ...state.periods[key] };
+    }
+
+    function getItemsByPeriod(periodKey) {
+      return state.items.filter(item => item.periodKey === periodKey);
+    }
+
+    function sumBy(items, fn) {
+      return items.reduce((acc, cur) => acc + Number(fn(cur) || 0), 0);
+    }
+
+    function isPlannedExpense(item) {
+      return item.status === '계획' && item.type === '변동지출';
+    }
+
+    function computeSummary(periodKey) {
+      const items = getItemsByPeriod(periodKey);
+      const income = sumBy(items.filter(i => i.type === '수입' && i.status === '현황'), i => i.amount);
+      const saving = sumBy(items.filter(i => i.type === '저축/투자' && i.status === '현황'), i => i.amount);
+      const fixed = sumBy(items.filter(i => i.type === '고정지출' && i.status === '현황'), i => i.amount);
+      const allowance = income - saving - fixed;
+      const actualExpense = sumBy(items.filter(i => i.status === '실제지출'), i => i.amount);
+      const plannedExpense = sumBy(items.filter(i => i.status === '계획된지출' || isPlannedExpense(i)), i => i.amount);
+      const usedBudget = actualExpense + plannedExpense;
+      const spare = allowance - actualExpense - plannedExpense;
+      const spendRate = allowance > 0 ? Math.min(100, Math.max(0, (usedBudget / allowance) * 100)) : 0;
+      return { income, saving, fixed, allowance, actualExpense, plannedExpense, usedBudget, spare, spendRate };
+    }
+
+    function getRemainingDays(endStr) {
+      const today = new Date();
+      const end = fromInputDate(endStr);
+      const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const diff = end - todayOnly;
+      return Math.max(1, Math.floor(diff / 86400000) + 1);
+    }
+
+    function getAssetTotal() {
+      return sumBy(state.assets, a => a.amount);
+    }
+
+    function getDebtTotal() {
+      return sumBy(state.items.filter(i => i.type === '부채' && i.status === '현황'), i => i.amount) +
+             sumBy(state.items.filter(i => i.type === '카드사용' && i.status === '계획된지출'), i => i.amount);
+    }
+
+    function updateAssetBySaving(item, deltaAmount) {
+      const asset = state.assets.find(a => a.category === item.category && (a.subcategory || '') === (item.subcategory || ''));
+      if (asset) asset.amount += Number(deltaAmount || 0);
+    }
+
+    function openModal(title, bodyHtml) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalBody').innerHTML = bodyHtml;
+      document.getElementById('modal').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('show');
+    }
+
+    function renderTabs(page) {
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.page === page);
+      });
+      document.querySelectorAll('.page').forEach(section => section.classList.remove('active'));
+      document.getElementById(`page-${page}`).classList.add('active');
+    }
+
+    function renderHome() {
+      const meta = getCurrentPeriodMeta();
+      const summary = computeSummary(meta.key);
+      const remainingDays = getRemainingDays(meta.end);
+      const daily = Math.floor(summary.spare / remainingDays);
+      const categoryBudget = topCategoryUsage(meta.key);
+
+      document.getElementById('page-home').innerHTML = `
+        <div class="card hero">
+          <div class="period-row">
+            <button class="hero-btn" onclick="movePeriod(-1)">＜</button>
+            <div class="period-center">
+              <span>${meta.title}</span>
+              <span>·</span>
+              <span>${formatDate(fromInputDate(meta.start))} ~ ${formatDate(fromInputDate(meta.end))}</span>
+            </div>
+            <button class="hero-btn" onclick="movePeriod(1)">＞</button>
+          </div>
+          <div class="chips" style="margin-bottom:10px;">
+            <span class="chip" onclick="openPeriodEditor()" style="cursor:pointer;">기간 수정</span>
+          </div>
+          <div class="title">남은 사용 가능 금액</div>
+          <div class="money-lg">${formatMoney(summary.spare)}</div>
+          <div class="hero-meta">
+            <div class="meta-box">
+              <div class="meta-label">예산 소진율</div>
+              <div class="meta-value">${summary.spendRate.toFixed(1)}%</div>
+            </div>
+            <div class="meta-box">
+              <div class="meta-label">다음 급여까지</div>
+              <div class="meta-value">D-${remainingDays}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="label">하루 사용 가능 금액</div>
+            <div class="report-num">${formatMoney(daily)}</div>
+          </div>
+          <div class="card">
+            <div class="label">사용한 예산</div>
+            <div class="report-num">${formatMoney(summary.usedBudget)}</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-head">
+            <div class="section-title">지출 현황</div>
+            <button class="ghost-btn" onclick="goPage('ledger')">상세보기</button>
+          </div>
+          <div class="row"><div class="label">이번달 용돈</div><div class="value">${formatMoney(summary.allowance)}</div></div>
+          <div class="row"><div class="label">현재까지 실제 지출</div><div class="value">${formatMoney(summary.actualExpense)}</div></div>
+          <div class="row"><div class="label">계획된 지출</div><div class="value">${formatMoney(summary.plannedExpense)}</div></div>
+          <div class="row"><div class="label">예산 내 여유 금액</div><div class="value">${formatMoney(summary.spare)}</div></div>
+        </div>
+
+        <div class="card">
+          <div class="section-head">
+            <div class="section-title">이번달 계획 요약</div>
+            <button class="ghost-btn" onclick="goPage('ledger')">상세보기</button>
+          </div>
+          <div class="row"><div class="label">수입 합계(현황)</div><div class="value">${formatMoney(summary.income)}</div></div>
+          <div class="row"><div class="label">저축/투자 합계(현황)</div><div class="value">${formatMoney(summary.saving)}</div></div>
+          <div class="row"><div class="label">고정지출 합계(현황)</div><div class="value">${formatMoney(summary.fixed)}</div></div>
+          <div class="row"><div class="label">변동지출 계획 합계</div><div class="value">${formatMoney(sumBy(getItemsByPeriod(meta.key).filter(i => i.type === '변동지출' && i.status === '계획'), i => i.amount))}</div></div>
+          <div class="row"><div class="label">이번달 예상 용돈</div><div class="value">${formatMoney(summary.allowance)}</div></div>
+        </div>
+
+        <div class="card">
+          <div class="section-head">
+            <div class="section-title">카테고리 예산 / 지출</div>
+            <button class="ghost-btn" onclick="goPage('reports')">리포트</button>
+          </div>
+          ${categoryBudget.length ? categoryBudget.map(row => `
+            <div class="budget-item">
+              <div class="budget-top">
+                <div>
+                  <div class="item-title">${row.category}</div>
+                  <div class="item-desc">${formatMoney(row.used)} / ${formatMoney(row.budget)}</div>
+                </div>
+                <div class="value">${row.rate.toFixed(0)}%</div>
+              </div>
+              <div class="budget-bar"><div class="budget-fill" style="width:${Math.min(100,row.rate)}%"></div></div>
+            </div>
+          `).join('') : `<div class="empty">카테고리 예산 데이터가 아직 없어요.</div>`}
+        </div>
+
+        <div class="card">
+          <div class="section-head"><div class="section-title">빠른 실행</div></div>
+          <div class="fab-wrap">
+            <button class="fab" onclick="openAddItem('수입')">수입 추가</button>
+            <button class="fab" onclick="openAddItem('저축/투자')">저축/투자 추가</button>
+            <button class="fab" onclick="openAddItem('변동지출')">변동지출 계획</button>
+            <button class="fab" onclick="openAddItem('카드사용')">카드사용 입력</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function topCategoryUsage(periodKey) {
+      const items = getItemsByPeriod(periodKey);
+      const map = {};
+      items.forEach(item => {
+        if (!['변동지출', '카드사용'].includes(item.type)) return;
+        const key = item.category;
+        if (!map[key]) map[key] = { category: key, budget: 0, used: 0 };
+        if (item.type === '변동지출' && item.status === '계획') map[key].budget += Number(item.amount);
+        if ((item.type === '카드사용' && item.status === '계획된지출') || item.status === '실제지출') map[key].used += Number(item.amount);
+      });
+      return Object.values(map).filter(v => v.budget > 0 || v.used > 0).map(v => ({ ...v, rate: v.budget > 0 ? (v.used / v.budget) * 100 : 0 })).sort((a,b)=>b.used-a.used).slice(0,5);
+    }
+
+    function renderLedger() {
+      const meta = getCurrentPeriodMeta();
+      const items = getItemsByPeriod(meta.key);
+      const plans = items.filter(i => i.status === '계획');
+      const cardPlanned = items.filter(i => i.status === '계획된지출');
+      const actuals = items.filter(i => i.status === '현황' || i.status === '실제지출');
+
+      document.getElementById('page-ledger').innerHTML = `
+        <div class="card">
+          <div class="section-head">
+            <div class="section-title">내역</div>
+            <div class="chips">
+              <span class="chip">${meta.title}</span>
+            </div>
+          </div>
+          <div class="fab-wrap">
+            <button class="fab" onclick="openAddItem('수입')">수입 계획</button>
+            <button class="fab" onclick="openAddItem('저축/투자')">저축 계획</button>
+            <button class="fab" onclick="openAddItem('고정지출')">고정지출 계획</button>
+            <button class="fab" onclick="openAddItem('변동지출')">변동지출 계획</button>
+            <button class="fab" onclick="openAddItem('카드사용')">카드사용 입력</button>
+            <button class="fab" onclick="openAddDebt()">부채 입력</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-head"><div class="section-title">계획</div></div>
+          ${plans.length ? plans.map(renderItemCard).join('') : `<div class="empty">등록된 계획이 없어요.</div>`}
+        </div>
+
+        <div class="card">
+          <div class="section-head"><div class="section-title">계획된 지출 / 카드결제예정</div></div>
+          ${cardPlanned.length ? cardPlanned.map(renderItemCard).join('') : `<div class="empty">계획된 지출이 없어요.</div>`}
+        </div>
+
+        <div class="card">
+          <div class="section-head"><div class="section-title">현황</div></div>
+          ${actuals.length ? actuals.map(renderItemCard).join('') : `<div class="empty">현황 내역이 없어요.</div>`}
+        </div>
+      `;
+    }
+
+    function renderItemCard(item) {
+      const badgeClass = item.status === '계획' ? 'plan' : item.status === '계획된지출' ? 'card' : 'actual';
+      const badgeText = item.status;
+      const sub = item.subcategory ? ` · ${item.subcategory}` : '';
+      const actions = [];
+      if (item.status === '계획') actions.push(`<button class="small-btn" onclick="openMoveConfirm('${item.id}')">이동</button>`);
+      if (item.type === '카드사용' && item.status === '계획된지출') actions.push(`<button class="small-btn" onclick="openCardPay('${item.id}')">즉시결제</button>`);
+      actions.push(`<button class="danger-btn" onclick="deleteItem('${item.id}')">삭제</button>`);
+
+      return `
+        <div class="list-card">
+          <div class="list-top">
+            <div>
+              <div class="item-title">${item.type} · ${item.category}${sub}</div>
+              <div class="item-desc">${item.memo || '메모 없음'} · ${item.date || ''}</div>
+            </div>
+            <div>
+              <div class="badge ${badgeClass}">${badgeText}</div>
+              <div class="value" style="margin-top:8px; text-align:right;">${formatMoney(item.amount)}</div>
+            </div>
+          </div>
+          <div class="actions">${actions.join('')}</div>
+        </div>
+      `;
+    }
+
+    function renderAssets() {
+      const totalAsset = getAssetTotal();
+      const debt = getDebtTotal();
+      const net = totalAsset - debt;
+      const grouped = {};
+      state.assets.forEach(a => {
+        if (!grouped[a.category]) grouped[a.category] = [];
+        grouped[a.category].push(a);
+      });
+
+      document.getElementById('page-assets').innerHTML = `
+        <div class="card">
+          <div class="section-title">자산</div>
+          <div class="report-grid" style="margin-top:12px;">
+            <div class="card" style="margin:0; box-shadow:none; border:1px solid var(--line);">
+              <div class="label">총자산</div>
+              <div class="report-num">${formatMoney(totalAsset)}</div>
+            </div>
+            <div class="card" style="margin:0; box-shadow:none; border:1px solid var(--line);">
+              <div class="label">순자산</div>
+              <div class="report-num">${formatMoney(net)}</div>
+            </div>
+          </div>
+        </div>
+        ${Object.entries(grouped).map(([category, list]) => `
+          <div class="card">
+            <div class="section-head"><div class="section-title">${category}</div></div>
+            ${list.map(a => `<div class="asset-box"><div class="row"><div class="label">${a.subcategory || category}</div><div class="value">${formatMoney(a.amount)}</div></div></div>`).join('')}
+          </div>
+        `).join('')}
+      `;
+    }
+
+    function renderReports() {
+      const meta = getCurrentPeriodMeta();
+      const summary = computeSummary(meta.key);
+      const varExpenseMap = {};
+      getItemsByPeriod(meta.key).forEach(item => {
+        if (!['변동지출', '카드사용'].includes(item.type)) return;
+        if (!(item.status === '실제지출' || item.status === '계획된지출')) return;
+        if (!varExpenseMap[item.category]) varExpenseMap[item.category] = 0;
+        varExpenseMap[item.category] += Number(item.amount);
+      });
+      const rows = Object.entries(varExpenseMap).sort((a,b)=>b[1]-a[1]);
+
+      document.getElementById('page-reports').innerHTML = `
+        <div class="card">
+          <div class="section-title">리포트</div>
+          <div class="report-grid" style="margin-top:12px;">
+            <div class="card" style="margin:0; box-shadow:none; border:1px solid var(--line);">
+              <div class="label">실제 지출</div>
+              <div class="report-num">${formatMoney(summary.actualExpense)}</div>
+            </div>
+            <div class="card" style="margin:0; box-shadow:none; border:1px solid var(--line);">
+              <div class="label">계획된 지출</div>
+              <div class="report-num">${formatMoney(summary.plannedExpense)}</div>
+            </div>
+            <div class="card" style="margin:0; box-shadow:none; border:1px solid var(--line);">
+              <div class="label">저축/투자</div>
+              <div class="report-num">${formatMoney(summary.saving)}</div>
+            </div>
+            <div class="card" style="margin:0; box-shadow:none; border:1px solid var(--line);">
+              <div class="label">예산 여유</div>
+              <div class="report-num">${formatMoney(summary.spare)}</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title">카테고리별 지출</div>
+          ${rows.length ? rows.map(([k,v]) => `<div class="row"><div class="label">${k}</div><div class="value">${formatMoney(v)}</div></div>`).join('') : `<div class="empty">표시할 지출 데이터가 없어요.</div>`}
+        </div>
+      `;
+    }
+
+    function renderSettings() {
+      document.getElementById('page-settings').innerHTML = `
+        <div class="card">
+          <div class="section-title">설정</div>
+          <label>월급일</label>
+          <input id="salaryDayInput" type="number" min="1" max="28" value="${state.salaryDay}" />
+          <div class="help">월급일은 1~28일로 설정하세요.</div>
+          <button class="primary-btn" onclick="saveSettings()">설정 저장</button>
+        </div>
+        <div class="card">
+          <div class="section-title">데이터 관리</div>
+          <button class="danger-btn" style="width:100%; padding:13px 14px;" onclick="resetApp()">전체 데이터 초기화</button>
+        </div>
+      `;
+    }
+
+    function movePeriod(delta) {
+      state.monthOffset += delta;
+      saveState();
+      renderAll();
+    }
+
+    function openPeriodEditor() {
+      const meta = getCurrentPeriodMeta();
+      openModal('기간 수정', `
+        <label>급여월 제목</label>
+        <input id="periodTitle" value="${meta.title}" />
+        <div class="inline-2">
+          <div>
+            <label>시작일</label>
+            <input id="periodStart" type="date" value="${meta.start}" />
+          </div>
+          <div>
+            <label>종료일</label>
+            <input id="periodEnd" type="date" value="${meta.end}" />
+          </div>
+        </div>
+        <button class="primary-btn" onclick="savePeriodMeta()">저장</button>
+      `);
+    }
+
+    function savePeriodMeta() {
+      const key = getCurrentPeriodMeta().key;
+      state.periods[key] = {
+        title: document.getElementById('periodTitle').value,
+        start: document.getElementById('periodStart').value,
+        end: document.getElementById('periodEnd').value
+      };
+      saveState();
+      closeModal();
+      renderAll();
+    }
+
+    function openAddItem(type) {
+      const meta = getCurrentPeriodMeta();
+      openModal(`${type} 추가`, buildItemForm(type, meta.key));
+      bindCategorySelect(type);
+    }
+
+    function buildItemForm(type, periodKey) {
+      return `
+        <input type="hidden" id="itemType" value="${type}" />
+        <input type="hidden" id="itemPeriodKey" value="${periodKey}" />
+        <label>카테고리</label>
+        <select id="itemCategory"></select>
+        <label>하위 카테고리</label>
+        <select id="itemSubcategory"></select>
+        <label>금액</label>
+        <input id="itemAmount" type="number" placeholder="예: 50000" />
+        <label>날짜</label>
+        <input id="itemDate" type="date" value="${toInputDate(new Date())}" />
+        <label>메모</label>
+        <textarea id="itemMemo" placeholder="메모를 입력하세요"></textarea>
+        <button class="primary-btn" onclick="saveNewItem()">저장</button>
+      `;
+    }
+
+    function bindCategorySelect(type) {
+      const categorySelect = document.getElementById('itemCategory');
+      const subSelect = document.getElementById('itemSubcategory');
+      const tree = CATEGORY_TREE[type];
+      const cats = Object.keys(tree);
+      categorySelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+      function updateSubs() {
+        const subs = tree[categorySelect.value] || [];
+        subSelect.innerHTML = `<option value="">선택 안 함</option>` + subs.map(s => `<option value="${s}">${s}</option>`).join('');
+      }
+      categorySelect.onchange = updateSubs;
+      updateSubs();
+    }
+
+    function saveNewItem() {
+      const type = document.getElementById('itemType').value;
+      const status = type === '카드사용' ? '계획된지출' : '계획';
+      const item = {
+        id: uid(),
+        periodKey: document.getElementById('itemPeriodKey').value,
+        type,
+        category: document.getElementById('itemCategory').value,
+        subcategory: document.getElementById('itemSubcategory').value,
+        amount: Number(document.getElementById('itemAmount').value || 0),
+        status,
+        date: document.getElementById('itemDate').value,
+        memo: document.getElementById('itemMemo').value.trim()
+      };
+      if (!item.amount) return alert('금액을 입력해주세요.');
+      state.items.push(item);
+      saveState();
+      closeModal();
+      renderAll();
+    }
+
+    function openMoveConfirm(itemId) {
+      const item = state.items.find(i => i.id === itemId);
+      if (!item) return;
+      openModal('이동 / 확정', `
+        <div class="card" style="box-shadow:none; border:1px solid var(--line); padding:12px;">
+          <div class="row"><div class="label">분류</div><div class="value">${item.type}</div></div>
+          <div class="row"><div class="label">카테고리</div><div class="value">${item.category}${item.subcategory ? ' · ' + item.subcategory : ''}</div></div>
+        </div>
+        <label>현황으로 이동할 금액</label>
+        <input id="moveAmount" type="number" value="${item.amount}" />
+        <label>날짜</label>
+        <input id="moveDate" type="date" value="${item.date || toInputDate(new Date())}" />
+        <label>메모</label>
+        <textarea id="moveMemo">${item.memo || ''}</textarea>
+        <button class="primary-btn" onclick="confirmMove('${item.id}')">확정</button>
+      `);
+    }
+
+    function confirmMove(itemId) {
+      const item = state.items.find(i => i.id === itemId);
+      if (!item) return;
+      item.amount = Number(document.getElementById('moveAmount').value || 0);
+      item.date = document.getElementById('moveDate').value;
+      item.memo = document.getElementById('moveMemo').value.trim();
+      item.status = item.type === '변동지출' ? '실제지출' : '현황';
+      if (item.type === '저축/투자') updateAssetBySaving(item, item.amount);
+      saveState();
+      closeModal();
+      renderAll();
+    }
+
+    function openCardPay(itemId) {
+      const item = state.items.find(i => i.id === itemId);
+      if (!item) return;
+      openModal('카드 즉시결제', `
+        <div class="card" style="box-shadow:none; border:1px solid var(--line); padding:12px;">
+          <div class="row"><div class="label">카테고리</div><div class="value">${item.category}${item.subcategory ? ' · ' + item.subcategory : ''}</div></div>
+        </div>
+        <label>결제 금액</label>
+        <input id="cardAmount" type="number" value="${item.amount}" />
+        <label>결제일</label>
+        <input id="cardDate" type="date" value="${item.date || toInputDate(new Date())}" />
+        <label>메모</label>
+        <textarea id="cardMemo">${item.memo || ''}</textarea>
+        <button class="primary-btn" onclick="confirmCardPay('${item.id}')">확정</button>
+      `);
+    }
+
+    function confirmCardPay(itemId) {
+      const item = state.items.find(i => i.id === itemId);
+      if (!item) return;
+      item.amount = Number(document.getElementById('cardAmount').value || 0);
+      item.date = document.getElementById('cardDate').value;
+      item.memo = document.getElementById('cardMemo').value.trim();
+      item.status = '실제지출';
+      saveState();
+      closeModal();
+      renderAll();
+    }
+
+    function openAddDebt() {
+      const meta = getCurrentPeriodMeta();
+      openModal('부채 입력', `
+        <input type="hidden" id="itemType" value="부채" />
+        <input type="hidden" id="itemPeriodKey" value="${meta.key}" />
+        <label>카테고리</label>
+        <select id="itemCategory"></select>
+        <label>하위 카테고리</label>
+        <select id="itemSubcategory"></select>
+        <label>금액</label>
+        <input id="itemAmount" type="number" placeholder="예: 500000" />
+        <label>날짜</label>
+        <input id="itemDate" type="date" value="${toInputDate(new Date())}" />
+        <label>메모</label>
+        <textarea id="itemMemo"></textarea>
+        <button class="primary-btn" onclick="saveDebt()">저장</button>
+      `);
+      bindCategorySelect('부채');
+    }
+
+    function saveDebt() {
+      const item = {
+        id: uid(),
+        periodKey: document.getElementById('itemPeriodKey').value,
+        type: '부채',
+        category: document.getElementById('itemCategory').value,
+        subcategory: document.getElementById('itemSubcategory').value,
+        amount: Number(document.getElementById('itemAmount').value || 0),
+        status: '현황',
+        date: document.getElementById('itemDate').value,
+        memo: document.getElementById('itemMemo').value.trim()
+      };
+      if (!item.amount) return alert('금액을 입력해주세요.');
+      state.items.push(item);
+      saveState();
+      closeModal();
+      renderAll();
+    }
+
+    function deleteItem(itemId) {
+      if (!confirm('이 항목을 삭제할까요?')) return;
+      state.items = state.items.filter(i => i.id !== itemId);
+      saveState();
+      renderAll();
+    }
+
+    function saveSettings() {
+      const salaryDay = Number(document.getElementById('salaryDayInput').value || 25);
+      if (salaryDay < 1 || salaryDay > 28) return alert('월급일은 1~28일로 입력해주세요.');
+      state.salaryDay = salaryDay;
+      saveState();
+      renderAll();
+      alert('설정이 저장되었습니다.');
+    }
+
+    function resetApp() {
+      if (!confirm('모든 데이터를 초기화할까요?')) return;
+      localStorage.removeItem(APP_KEY);
+      state = loadState();
+      renderAll();
+    }
+
+    function goPage(page) {
+      renderTabs(page);
+      renderAll(page);
+    }
+
+    function renderAll(activePage) {
+      renderHome();
+      renderLedger();
+      renderAssets();
+      renderReports();
+      renderSettings();
+      if (activePage) renderTabs(activePage);
+    }
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => goPage(tab.dataset.page));
+    });
+
+    document.getElementById('modal').addEventListener('click', (e) => {
+      if (e.target.id === 'modal') closeModal();
+    });
+
+    renderAll('home');
+  </script>
 </body>
 </html>
