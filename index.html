@@ -403,6 +403,11 @@
       assetKey('기타', '연금저축')
     ]);
 
+
+    function clone(obj) {
+      return JSON.parse(JSON.stringify(obj));
+    }
+    
     const DEFAULT_STATE = {
       version: APP_VERSION,
       salaryDay: 25,
@@ -415,9 +420,7 @@
       settings: { theme: 'light', latestSeenVersion: APP_VERSION }
     };
     
-    function clone(obj) {
-      return JSON.parse(JSON.stringify(obj));
-    }
+    
     function uid() {
       return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
     }
