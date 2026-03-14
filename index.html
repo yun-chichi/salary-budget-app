@@ -50,23 +50,40 @@
     }
     .hero .period-row {
       display: flex;
-      align-items: center;
+      align-items: stretch;
       justify-content: space-between;
       gap: 8px;
-      margin-bottom: 10px;
+      margin-bottom: 14px;
     }
     .period-center {
       display: flex;
-      align-items: center;
-      gap: 8px;
+      flex-direction: column;
+      gap: 6px;
       font-size: 13px;
       background: rgba(255,255,255,0.14);
-      border-radius: 999px;
-      padding: 7px 10px;
-      text-align: center;
+      border-radius: 16px;
+      padding: 10px 12px;
+      text-align: left;
       flex: 1;
       justify-content: center;
-      min-height: 34px;
+      min-height: 66px;
+    }
+    .period-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .period-line .period-k {
+      opacity: 0.82;
+      font-size: 12px;
+      flex: 0 0 48px;
+    }
+    .period-line .period-v {
+      font-weight: 700;
+      text-align: right;
+      flex: 1;
+      word-break: keep-all;
     }
     .hero-btn, .ghost-btn, .small-btn, .danger-btn, .primary-btn, .soft-btn, .fab {
       border: none;
@@ -81,6 +98,7 @@
       background: rgba(255,255,255,0.15);
       color: #fff;
       font-weight: 800;
+      align-self: center;
     }
     .ghost-btn { padding: 8px 10px; background: #eef2ff; color: var(--primary-dark); }
     .soft-btn { padding: 8px 10px; background: #f3f4f6; color: var(--text); }
@@ -326,6 +344,42 @@
       font-weight: 700;
       color: var(--text);
     }
+    .hero-summary {
+      background: rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 6px 12px;
+      margin-bottom: 14px;
+    }
+    .hero-summary-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.14);
+    }
+    .hero-summary-row:last-child { border-bottom: none; }
+    .hero-summary-label {
+      font-size: 13px;
+      opacity: 0.88;
+    }
+    .hero-summary-value {
+      font-size: 18px;
+      font-weight: 800;
+      text-align: right;
+      min-width: 100px;
+    }
+    .card-company-wrap { display: none; }
+    .plan-category-group { margin-bottom: 14px; }
+    .plan-category-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      margin-bottom: 8px;
+      padding: 6px 10px;
+      background: #eef4ff;
+      border-radius: 10px;
+    }
     button:disabled {
       opacity: 0.45;
       cursor: default;
@@ -364,7 +418,7 @@
   <script>
     const APP_KEY = 'salary-budget-master-v2';
     const LEGACY_KEYS = ['salary-budget-master-v1'];
-    const APP_VERSION = '2.2.0';
+    const APP_VERSION = '2.3.0';
 
     function clone(obj) {
       return JSON.parse(JSON.stringify(obj));
@@ -445,22 +499,24 @@
     };
 
     const RECURRING_DEFAULTS = [
-      { type: '수입', category: '월급', subcategory: '', amount: 2750000, memo: '기본 월급', active: true },
-      { type: '수입', category: '수당', subcategory: '통계활동비', amount: 100000, memo: '기본 반복', active: true },
-      { type: '고정지출', category: '기타', subcategory: '여행계', amount: 80000, memo: '기본 반복', active: true },
-      { type: '고정지출', category: '기타', subcategory: '가족계', amount: 50000, memo: '기본 반복', active: true },
-      { type: '고정지출', category: '기타', subcategory: '지역인재', amount: 15000, memo: '기본 반복', active: true },
-      { type: '고정지출', category: '기타', subcategory: '팀비', amount: 20000, memo: '기본 반복', active: true },
-      { type: '저축/투자', category: '코인', subcategory: '비트코인', amount: 200000, memo: '기본 반복', active: true },
-      { type: '저축/투자', category: '금', subcategory: '', amount: 200000, memo: '기본 반복', active: true },
-      { type: '저축/투자', category: '주식', subcategory: 'ISA', amount: 500000, memo: '기본 반복', active: true },
-      { type: '저축/투자', category: '기타', subcategory: '연금저축', amount: 100000, memo: '기본 반복', active: true },
-      { type: '저축/투자', category: '기타', subcategory: '주택청약', amount: 50000, memo: '기본 반복', active: true },
-      { type: '저축/투자', category: '현금', subcategory: '경조사', amount: 150000, memo: '기본 반복', active: true },
-      { type: '저축/투자', category: '현금', subcategory: '비상금', amount: 100000, memo: '기본 반복', active: true },
-      { type: '고정지출', category: '보험', subcategory: '', amount: 15900, memo: '기본 반복', active: true },
-      { type: '저축/투자', category: '주식', subcategory: '토스증권', amount: 200000, memo: '기본 반복', active: true }
+      { type: '수입', category: '월급', subcategory: '', amount: 2750000, memo: '기본 월급', active: true, monthlyDay: '' },
+      { type: '수입', category: '수당', subcategory: '통계활동비', amount: 100000, memo: '기본 반복', active: true, monthlyDay: '' },
+      { type: '고정지출', category: '기타', subcategory: '여행계', amount: 80000, memo: '기본 반복', active: true, monthlyDay: '' },
+      { type: '고정지출', category: '기타', subcategory: '가족계', amount: 50000, memo: '기본 반복', active: true, monthlyDay: '' },
+      { type: '고정지출', category: '기타', subcategory: '지역인재', amount: 15000, memo: '기본 반복', active: true, monthlyDay: '' },
+      { type: '고정지출', category: '기타', subcategory: '팀비', amount: 20000, memo: '기본 반복', active: true, monthlyDay: '' },
+      { type: '저축/투자', category: '코인', subcategory: '비트코인', amount: 200000, memo: '기본 반복', active: true, monthlyDay: '' },
+      { type: '저축/투자', category: '금', subcategory: '', amount: 200000, memo: '기본 반복', active: true, monthlyDay: '' },
+      { type: '저축/투자', category: '주식', subcategory: 'ISA', amount: 500000, memo: '기본 반복', active: true, monthlyDay: '' },
+      { type: '저축/투자', category: '기타', subcategory: '연금저축', amount: 100000, memo: '기본 반복', active: true, monthlyDay: '' },
+      { type: '저축/투자', category: '기타', subcategory: '주택청약', amount: 50000, memo: '기본 반복', active: true, monthlyDay: '' },
+      { type: '저축/투자', category: '현금', subcategory: '경조사', amount: 150000, memo: '기본 반복', active: true, monthlyDay: '' },
+      { type: '저축/투자', category: '현금', subcategory: '비상금', amount: 100000, memo: '기본 반복', active: true, monthlyDay: '' },
+      { type: '고정지출', category: '보험', subcategory: '', amount: 15900, memo: '기본 반복', active: true, monthlyDay: '' },
+      { type: '저축/투자', category: '주식', subcategory: '토스증권', amount: 200000, memo: '기본 반복', active: true, monthlyDay: '' }
     ];
+
+    const CARD_COMPANIES = ['신한카드', '현대카드', '기타'];
 
     const KR_HOLIDAYS = {
       '2026-01-01': '신정',
@@ -609,6 +665,7 @@
         source: item.source || 'manual',
         linkedAssetKey: item.linkedAssetKey || '',
         linkedFundType: item.linkedFundType || '',
+        cardCompany: item.cardCompany || '',
         createdAt: item.createdAt || new Date().toISOString()
       })) : [];
       merged.assets = Array.isArray(raw.assets) && raw.assets.length
@@ -633,7 +690,8 @@
             subcategory: rule.subcategory || '',
             amount: Number(rule.amount || 0),
             memo: rule.memo || '',
-            active: rule.active !== false
+            active: rule.active !== false,
+            monthlyDay: rule.monthlyDay || ''
           }))
         : clone(RECURRING_DEFAULTS);
       merged.fundLedgers = Array.isArray(raw.fundLedgers) ? raw.fundLedgers : [];
@@ -706,6 +764,17 @@
       });
     }
 
+    function sortPlansByCategoryDate(items) {
+      return [...items].sort((a, b) => {
+        if (a.category !== b.category) return a.category.localeCompare(b.category, 'ko');
+        const da = a.date || '0000-00-00';
+        const db = b.date || '0000-00-00';
+        if (da !== db) return db.localeCompare(da);
+        if ((a.subcategory || '') !== (b.subcategory || '')) return (a.subcategory || '').localeCompare(b.subcategory || '', 'ko');
+        return (b.createdAt || '').localeCompare(a.createdAt || '');
+      });
+    }
+
     function sumBy(items, fn) {
       return items.reduce((acc, cur) => acc + Number(fn(cur) || 0), 0);
     }
@@ -758,11 +827,34 @@
       asset.editableAt = item.date || toInputDate(new Date());
     }
 
+    function getMonthlyOccurrenceInPeriod(startStr, endStr, monthlyDay) {
+      if (!monthlyDay) return startStr;
+      const day = Math.min(31, Math.max(1, Number(monthlyDay)));
+      const start = fromInputDate(startStr);
+      const end = fromInputDate(endStr);
+
+      const candidates = [
+        new Date(start.getFullYear(), start.getMonth(), Math.min(day, new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate())),
+        new Date(end.getFullYear(), end.getMonth(), Math.min(day, new Date(end.getFullYear(), end.getMonth() + 1, 0).getDate()))
+      ];
+
+      const inRange = candidates
+        .map(d => normalizeDateOnly(d))
+        .filter((d, idx, arr) => arr.findIndex(v => v.getTime() === d.getTime()) === idx)
+        .filter(d => d >= normalizeDateOnly(start) && d <= normalizeDateOnly(end))
+        .sort((a, b) => a - b);
+
+      return inRange.length ? toInputDate(inRange[0]) : startStr;
+    }
+
     function createRecurringItemsForPeriod(periodKey, startDate) {
       const existing = getItemsByPeriod(periodKey).filter(i => i.source === 'recurring');
       if (existing.length) return;
+
+      const meta = state.periods[periodKey] || { start: startDate, end: startDate };
       const previousKey = getPreviousPeriodKey(periodKey);
       const previousItems = getItemsByPeriod(previousKey);
+
       state.recurringRules.filter(r => r.active).forEach(rule => {
         const prev = previousItems.find(i =>
           i.source === 'recurring' &&
@@ -770,6 +862,7 @@
           i.category === rule.category &&
           (i.subcategory || '') === (rule.subcategory || '')
         );
+
         state.items.push({
           id: uid(),
           periodKey,
@@ -778,11 +871,12 @@
           subcategory: rule.subcategory || '',
           amount: Number(prev?.amount ?? rule.amount ?? 0),
           status: '계획',
-          date: startDate,
+          date: getMonthlyOccurrenceInPeriod(meta.start, meta.end, rule.monthlyDay),
           memo: prev?.memo || rule.memo || '반복 기본값',
           source: 'recurring',
           linkedAssetKey: '',
           linkedFundType: '',
+          cardCompany: '',
           createdAt: new Date().toISOString()
         });
       });
@@ -937,6 +1031,19 @@
       `;
     }
 
+    function buildCardCompanyField(actualType, selected = '') {
+      const isCard = actualType === '카드사용';
+      return `
+        <div id="cardCompanyWrap" class="card-company-wrap" style="${isCard ? 'display:block;' : ''}">
+          <label>카드사</label>
+          <select id="itemCardCompany">
+            <option value="">선택 안 함</option>
+            ${CARD_COMPANIES.map(company => `<option value="${company}" ${company === selected ? 'selected' : ''}>${company}</option>`).join('')}
+          </select>
+        </div>
+      `;
+    }
+
     function buildItemForm(type, periodKey, item = null) {
       const meta = state.periods[periodKey];
       const today = toInputDate(new Date());
@@ -969,6 +1076,8 @@
 
         <label>하위 카테고리</label>
         <select id="itemSubcategory"></select>
+
+        ${buildCardCompanyField(isExpenseUnified ? actualType : type, item?.cardCompany || '')}
 
         <label>상태</label>
         <div id="itemStatusWrap">
@@ -1025,6 +1134,11 @@
         actualType,
         actualType === '카드사용' ? '계획된지출' : '계획'
       );
+
+      const wrap = document.getElementById('cardCompanyWrap');
+      if (wrap) {
+        wrap.style.display = actualType === '카드사용' ? 'block' : 'none';
+      }
       bindCategorySelect('지출통합');
     }
 
@@ -1044,6 +1158,42 @@
       `;
     }
 
+    function buildPlanSection(title, items, emptyText = '등록된 계획이 없어요.') {
+      if (!items.length) {
+        return `
+          <div class="card">
+            <div class="section-head">
+              <div class="section-title">${title}</div>
+              <div class="value">${formatMoney(0)}</div>
+            </div>
+            <div class="empty">${emptyText}</div>
+          </div>
+        `;
+      }
+
+      const groups = {};
+      items.forEach(item => {
+        if (!groups[item.category]) groups[item.category] = [];
+        groups[item.category].push(item);
+      });
+
+      const groupHtml = Object.entries(groups).map(([category, list]) => `
+        <div class="plan-category-group">
+          <div class="plan-category-title">${category} · ${formatMoney(getSectionTotal(list))}</div>
+          ${list.map(renderItemCard).join('')}
+        </div>
+      `).join('');
+
+      return `
+        <div class="card">
+          <div class="section-head">
+            <div class="section-title">${title}</div>
+          </div>
+          ${groupHtml}
+        </div>
+      `;
+    }
+
     function renderPeriodNavigator() {
       const meta = getCurrentPeriodMeta();
       return `
@@ -1059,7 +1209,6 @@
       const meta = getCurrentPeriodMeta();
       const summary = computeSummary(meta.key);
       const remainingDays = getRemainingDays(meta.end);
-      const daily = Math.floor(summary.spare / remainingDays);
       const categoryBudget = topCategoryUsage(meta.key);
 
       document.getElementById('page-home').innerHTML = `
@@ -1067,38 +1216,31 @@
           <div class="period-row">
             <button class="hero-btn" onclick="movePeriod(-1)">＜</button>
             <div class="period-center">
-              <span>${meta.title}</span>
-              <span>·</span>
-              <span>${formatDate(fromInputDate(meta.start))} ~ ${formatDate(fromInputDate(meta.end))}</span>
+              <div class="period-line">
+                <div class="period-k">급여월</div>
+                <div class="period-v">${meta.title}</div>
+              </div>
+              <div class="period-line">
+                <div class="period-k">기간</div>
+                <div class="period-v">${formatDate(fromInputDate(meta.start))} ~ ${formatDate(fromInputDate(meta.end))}</div>
+              </div>
             </div>
             <button class="hero-btn" onclick="movePeriod(1)">＞</button>
           </div>
-          <div class="chips" style="margin-bottom:10px;">
-            <span class="chip" onclick="openPeriodEditor()">기간 수정</span>
-            <span class="chip">버전 ${APP_VERSION}</span>
-          </div>
-          <div class="title">남은 사용 가능 금액</div>
-          <div class="money-lg">${formatMoney(summary.spare)}</div>
-          <div class="hero-meta">
-            <div class="meta-box">
-              <div class="meta-label">예산 소진율</div>
-              <div class="meta-value">${summary.spendRate.toFixed(1)}%</div>
-            </div>
-            <div class="meta-box">
-              <div class="meta-label">다음 급여까지</div>
-              <div class="meta-value">D-${remainingDays}</div>
-            </div>
-          </div>
-        </div>
 
-        <div class="grid-2">
-          <div class="card">
-            <div class="label">하루 사용 가능 금액</div>
-            <div class="report-num">${formatMoney(daily)}</div>
-          </div>
-          <div class="card">
-            <div class="label">사용한 예산</div>
-            <div class="report-num">${formatMoney(summary.usedBudget)}</div>
+          <div class="hero-summary">
+            <div class="hero-summary-row">
+              <div class="hero-summary-label">남은 사용 가능 금액</div>
+              <div class="hero-summary-value">${formatMoney(summary.spare)}</div>
+            </div>
+            <div class="hero-summary-row">
+              <div class="hero-summary-label">예산소진율</div>
+              <div class="hero-summary-value">${summary.spendRate.toFixed(1)}%</div>
+            </div>
+            <div class="hero-summary-row">
+              <div class="hero-summary-label">다음 급여까지</div>
+              <div class="hero-summary-value">D-${remainingDays}</div>
+            </div>
           </div>
         </div>
 
@@ -1171,6 +1313,7 @@
 
       const badgeText = getStatusLabel(item.status);
       const sub = item.subcategory ? ` · ${item.subcategory}` : '';
+      const cardCompanyText = item.type === '카드사용' && item.cardCompany ? ` · ${item.cardCompany}` : '';
       const actions = [];
       actions.push(`<button class="small-btn" onclick="openEditItem('${item.id}')">수정</button>`);
 
@@ -1193,7 +1336,7 @@
           <div class="list-top">
             <div>
               <div class="item-title">${item.type} · ${item.category}${sub}</div>
-              <div class="item-desc">${item.memo || '메모 없음'} · ${item.date || ''}</div>
+              <div class="item-desc">${item.memo || '메모 없음'}${cardCompanyText} · ${item.date || ''}</div>
             </div>
             <div>
               <div class="badge ${badgeClass}">${badgeText}</div>
@@ -1209,7 +1352,7 @@
       const meta = getCurrentPeriodMeta();
       const items = getItemsByPeriod(meta.key);
 
-      const plans = sortByDateDesc(items.filter(i => i.status === '계획'));
+      const plans = sortPlansByCategoryDate(items.filter(i => i.status === '계획'));
       const plannedExpense = sortByDateDesc(items.filter(i => i.status === '계획된지출'));
 
       const actualIncome = sortByDateDesc(items.filter(i => i.type === '수입' && i.status === '현황'));
@@ -1245,7 +1388,6 @@
         <div class="card">
           <div class="section-head">
             <div class="section-title">계획 합계</div>
-            <div class="value">${formatMoney(getSectionTotal(plans))}</div>
           </div>
           <div class="summary-strip">
             <div class="summary-mini">
@@ -1267,7 +1409,7 @@
           </div>
         </div>
 
-        ${buildLedgerSection('계획', plans, '등록된 계획이 없어요.')}
+        ${buildPlanSection('계획', plans, '등록된 계획이 없어요.')}
         ${buildLedgerSection('카드값', plannedExpense, '카드값 내역이 없어요.')}
         ${buildLedgerSection('현황 · 수입', actualIncome, '수입 현황이 없어요.')}
         ${buildLedgerSection('현황 · 저축/투자', actualSaving, '저축/투자 현황이 없어요.')}
@@ -1395,7 +1537,15 @@
 
         <div class="card">
           <div class="section-title">카테고리별 합계</div>
-          ${catRows.length ? catRows.map(([k, v]) => `<div class="row"><div class="label">${k}</div><div class="value">${formatMoney(v)}</div></div>`).join('') : `<div class="empty">표시할 데이터가 없어요.</div>`}
+          ${catRows.length ? catRows.map(([k, v]) => `
+            <div class="row">
+              <div class="label">${k}</div>
+              <div class="actions" style="margin-top:0;">
+                <div class="value" style="min-width:88px; text-align:right;">${formatMoney(v)}</div>
+                <button class="small-btn" onclick="openReportCategoryDetail('${escapeJs(k)}')">내역보기</button>
+              </div>
+            </div>
+          `).join('') : `<div class="empty">표시할 데이터가 없어요.</div>`}
         </div>
 
         <div class="card">
@@ -1406,6 +1556,8 @@
     }
 
     function renderSettings() {
+      const meta = getCurrentPeriodMeta();
+
       document.getElementById('page-settings').innerHTML = `
         <div class="card">
           <div class="section-title">설정</div>
@@ -1413,6 +1565,15 @@
           <input id="salaryDayInput" type="number" min="1" max="28" value="${state.salaryDay}" />
           <div class="help">월급일은 1~28일로 입력하세요. 주말·공휴일이면 직전 영업일로 계산해요.</div>
           <button class="primary-btn" onclick="saveSettings()">설정 저장</button>
+        </div>
+
+        <div class="card">
+          <div class="section-head">
+            <div class="section-title">급여월 기간 관리</div>
+            <button class="ghost-btn" onclick="openPeriodEditor()">수정</button>
+          </div>
+          <div class="row"><div class="label">현재 급여월</div><div class="value">${meta.title}</div></div>
+          <div class="row"><div class="label">기간</div><div class="value">${formatDate(fromInputDate(meta.start))} ~ ${formatDate(fromInputDate(meta.end))}</div></div>
         </div>
 
         <div class="card">
@@ -1436,7 +1597,14 @@
             <div class="section-title">반복 기본값</div>
             <button class="ghost-btn" onclick="openRecurringEditor()">관리</button>
           </div>
-          <div class="muted">설정에서 수정한 반복 기본값은 이후 급여월부터 반영돼요.</div>
+          <div class="muted">추가/수정한 반복 기본값은 이후 급여월부터 반영돼요. 월별 일자도 지정할 수 있어요.</div>
+        </div>
+
+        <div class="card">
+          <div class="section-head">
+            <div class="section-title">앱 정보</div>
+          </div>
+          <div class="row"><div class="label">버전</div><div class="value">${APP_VERSION}</div></div>
         </div>
 
         <div class="card">
@@ -1544,6 +1712,7 @@
         source: 'manual',
         linkedAssetKey: '',
         linkedFundType: '',
+        cardCompany: actualType === '카드사용' ? (document.getElementById('itemCardCompany')?.value || '') : '',
         createdAt: new Date().toISOString()
       };
 
@@ -1593,6 +1762,7 @@
       openModal('카드 즉시결제', `
         <div class="sub-card">
           <div class="row"><div class="label">카테고리</div><div class="value">${item.category}${item.subcategory ? ' · ' + item.subcategory : ''}</div></div>
+          ${item.cardCompany ? `<div class="row"><div class="label">카드사</div><div class="value">${item.cardCompany}</div></div>` : ''}
         </div>
         <label>결제 금액</label>
         ${moneyInput('cardAmount', item.amount)}
@@ -1643,6 +1813,7 @@
       item.amount = getMoneyValue('itemAmount');
       item.date = document.getElementById('itemDate').value;
       item.memo = document.getElementById('itemMemo').value.trim();
+      item.cardCompany = actualType === '카드사용' ? (document.getElementById('itemCardCompany')?.value || '') : '';
 
       if (!item.amount) return alert('금액을 입력해주세요.');
 
@@ -1716,6 +1887,7 @@
         source: 'allowance-transfer',
         linkedAssetKey: '',
         linkedFundType: '',
+        cardCompany: '',
         createdAt: new Date().toISOString()
       });
 
@@ -1880,6 +2052,7 @@
           source: 'fund-ledger',
           linkedAssetKey: assetKey('현금', fundType),
           linkedFundType: fundType,
+          cardCompany: '',
           createdAt: new Date().toISOString()
         });
       }
@@ -1895,6 +2068,9 @@
           <div class="item-title" style="margin-bottom:8px;">${rule.type} · ${rule.category}${rule.subcategory ? ' · ' + rule.subcategory : ''}</div>
           <label>기본 금액</label>
           ${moneyInput(`rule_amount_${idx}`, rule.amount)}
+          <label>월별 일자</label>
+          <input id="rule_day_${idx}" type="number" min="1" max="31" value="${rule.monthlyDay || ''}" placeholder="예: 20" />
+          <div class="help">비워두면 급여월 시작일로 들어가고, 숫자를 넣으면 해당 날짜가 급여월 기간 안에 자동 반영돼요.</div>
           <label>메모</label>
           <input id="rule_memo_${idx}" value="${rule.memo || ''}" />
           <label>사용 여부</label>
@@ -1902,13 +2078,123 @@
             <option value="true" ${rule.active ? 'selected' : ''}>사용</option>
             <option value="false" ${!rule.active ? 'selected' : ''}>미사용</option>
           </select>
+          <div class="actions">
+            <button class="danger-btn" onclick="deleteRecurringRule(${idx})">삭제</button>
+          </div>
         </div>
       `).join('');
 
       openModal('반복 기본값 관리', `
-        ${rows}
+        <div class="actions" style="margin-bottom:12px;">
+          <button class="small-btn" onclick="addRecurringRule()">추가</button>
+        </div>
+        ${rows || `<div class="empty">등록된 반복 기본값이 없어요.</div>`}
         <button class="primary-btn" onclick="saveRecurringRules()">저장</button>
       `);
+    }
+
+    function addRecurringRule() {
+      const meta = getCurrentPeriodMeta();
+      const defaultType = '고정지출';
+      const defaultTree = getCategoryTree(defaultType);
+      const defaultCategory = Object.keys(defaultTree)[0] || '';
+      const defaultSub = (defaultTree[defaultCategory] || [])[0] || '';
+
+      closeModal();
+      openModal('반복 기본값 추가', `
+        <label>구분</label>
+        <select id="newRuleType" onchange="onNewRuleTypeChange()">
+          ${['수입', '저축/투자', '고정지출', '변동지출'].map(t => `<option value="${t}" ${t === defaultType ? 'selected' : ''}>${t}</option>`).join('')}
+        </select>
+
+        <label>카테고리</label>
+        <select id="newRuleCategory"></select>
+
+        <label>하위 카테고리</label>
+        <select id="newRuleSubcategory"></select>
+
+        <label>기본 금액</label>
+        ${moneyInput('newRuleAmount')}
+
+        <label>월별 일자</label>
+        <input id="newRuleMonthlyDay" type="number" min="1" max="31" placeholder="예: 20" />
+        <div class="help">예: 20 입력 시 해당 급여월 기간 안의 매달 20일로 자동 반영돼요.</div>
+
+        <label>메모</label>
+        <input id="newRuleMemo" placeholder="예: 월 고정비" />
+
+        <label>사용 여부</label>
+        <select id="newRuleActive">
+          <option value="true" selected>사용</option>
+          <option value="false">미사용</option>
+        </select>
+
+        <button class="primary-btn" onclick="saveNewRecurringRule()">추가</button>
+      `);
+
+      bindNewRuleCategorySelect(defaultType, { category: defaultCategory, subcategory: defaultSub });
+    }
+
+    function onNewRuleTypeChange() {
+      bindNewRuleCategorySelect(document.getElementById('newRuleType').value);
+    }
+
+    function bindNewRuleCategorySelect(type, preset = null) {
+      const categorySelect = document.getElementById('newRuleCategory');
+      const subSelect = document.getElementById('newRuleSubcategory');
+      const tree = getCategoryTree(type);
+      const cats = Object.keys(tree);
+
+      categorySelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+
+      function updateSubs() {
+        const subs = tree[categorySelect.value] || [];
+        subSelect.innerHTML = `<option value="">선택 안 함</option>` + subs.map(s => `<option value="${s}">${s}</option>`).join('');
+      }
+
+      categorySelect.onchange = updateSubs;
+      if (preset?.category && cats.includes(preset.category)) {
+        categorySelect.value = preset.category;
+      }
+      updateSubs();
+      if (preset?.subcategory) subSelect.value = preset.subcategory;
+    }
+
+    function saveNewRecurringRule() {
+      const type = document.getElementById('newRuleType').value;
+      const category = document.getElementById('newRuleCategory').value;
+      const subcategory = document.getElementById('newRuleSubcategory').value;
+      const amount = getMoneyValue('newRuleAmount');
+      const monthlyDay = document.getElementById('newRuleMonthlyDay').value;
+      const memo = document.getElementById('newRuleMemo').value.trim();
+      const active = document.getElementById('newRuleActive').value === 'true';
+
+      if (!category) return alert('카테고리를 선택해주세요.');
+      if (!amount) return alert('금액을 입력해주세요.');
+
+      state.recurringRules.push({
+        type,
+        category,
+        subcategory,
+        amount,
+        memo,
+        active,
+        monthlyDay: monthlyDay ? String(Math.min(31, Math.max(1, Number(monthlyDay)))) : ''
+      });
+
+      saveState();
+      closeModal();
+      openRecurringEditor();
+      renderAll();
+    }
+
+    function deleteRecurringRule(idx) {
+      if (!confirm('이 반복 기본값을 삭제할까요?')) return;
+      state.recurringRules.splice(idx, 1);
+      saveState();
+      closeModal();
+      openRecurringEditor();
+      renderAll();
     }
 
     function saveRecurringRules() {
@@ -1916,7 +2202,12 @@
         ...rule,
         amount: getMoneyValue(`rule_amount_${idx}`),
         memo: document.getElementById(`rule_memo_${idx}`).value.trim(),
-        active: document.getElementById(`rule_active_${idx}`).value === 'true'
+        active: document.getElementById(`rule_active_${idx}`).value === 'true',
+        monthlyDay: (() => {
+          const raw = document.getElementById(`rule_day_${idx}`).value;
+          if (!raw) return '';
+          return String(Math.min(31, Math.max(1, Number(raw))));
+        })()
       }));
       saveState();
       closeModal();
@@ -2172,6 +2463,25 @@
       saveState();
       rerenderCategoryManager();
       renderAll();
+    }
+
+    function openReportCategoryDetail(category) {
+      const meta = getCurrentPeriodMeta();
+      const items = sortByDateDesc(
+        getItemsByPeriod(meta.key).filter(item =>
+          item.category === category &&
+          ['변동지출', '카드사용'].includes(item.type) &&
+          ['실제지출', '계획된지출'].includes(item.status)
+        )
+      );
+
+      openModal(`${category} 사용 내역`, `
+        <div class="section-head">
+          <div class="section-title">${category}</div>
+          <div class="value">${formatMoney(getSectionTotal(items))}</div>
+        </div>
+        ${items.length ? items.map(renderItemCard).join('') : `<div class="empty">사용 내역이 없어요.</div>`}
+      `);
     }
 
     function exportData() {
