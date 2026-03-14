@@ -309,6 +309,23 @@
     .row-inline-budget .budget-input {
       flex: 1;
     }
+    .period-nav-inline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .period-nav-inline .period-label {
+      flex: 1;
+      text-align: center;
+      background: #f3f6fb;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 9px 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
     button:disabled {
       opacity: 0.45;
       cursor: default;
@@ -811,7 +828,7 @@
       const plannedVariableExpense = sumBy(items.filter(i => i.type === '변동지출' && i.status === '계획'), i => i.amount);
       const plannedExpense = plannedCardExpense + plannedVariableExpense;
 
-      const usedBudget = actualExpense + plannedCardExpense;
+      const usedBudget = actualExpense + plannedCardExpense + plannedVariableExpense;
       const spare = allowance - usedBudget;
       const spendRate = allowance > 0 ? Math.min(100, Math.max(0, (usedBudget / allowance) * 100)) : 0;
 
@@ -903,14 +920,19 @@
       return ['계획', '현황'];
     }
 
+    function getStatusLabel(status) {
+      if (status === '계획된지출') return '카드값';
+      return status;
+    }
+
     function buildStatusSelect(type, selected) {
       const options = getStatusOptions(type);
       if (options.length === 1) {
-        return `<input type="hidden" id="itemStatus" value="${options[0]}" /><div class="pill">${options[0]}</div>`;
+        return `<input type="hidden" id="itemStatus" value="${options[0]}" /><div class="pill">${getStatusLabel(options[0])}</div>`;
       }
       return `
         <select id="itemStatus">
-          ${options.map(s => `<option value="${s}" ${s === selected ? 'selected' : ''}>${s}</option>`).join('')}
+          ${options.map(s => `<option value="${s}" ${s === selected ? 'selected' : ''}>${getStatusLabel(s)}</option>`).join('')}
         </select>
       `;
     }
@@ -1022,6 +1044,17 @@
       `;
     }
 
+    function renderPeriodNavigator() {
+      const meta = getCurrentPeriodMeta();
+      return `
+        <div class="period-nav-inline">
+          <button class="hero-btn" style="background:#dbeafe;color:#1e40af;" onclick="movePeriod(-1)">＜</button>
+          <div class="period-label">${meta.title}</div>
+          <button class="hero-btn" style="background:#dbeafe;color:#1e40af;" onclick="movePeriod(1)">＞</button>
+        </div>
+      `;
+    }
+
     function renderHome() {
       const meta = getCurrentPeriodMeta();
       const summary = computeSummary(meta.key);
@@ -1076,7 +1109,7 @@
           </div>
           <div class="row"><div class="label">이번달 용돈</div><div class="value">${formatMoney(summary.allowance)}</div></div>
           <div class="row"><div class="label">현재까지 실제 지출</div><div class="value">${formatMoney(summary.actualExpense)}</div></div>
-          <div class="row"><div class="label">계획된 카드사용</div><div class="value">${formatMoney(summary.plannedCardExpense)}</div></div>
+          <div class="row"><div class="label">카드값</div><div class="value">${formatMoney(summary.plannedCardExpense)}</div></div>
           <div class="row"><div class="label">계획된 변동지출</div><div class="value">${formatMoney(summary.plannedVariableExpense)}</div></div>
           <div class="row"><div class="label">계획된 지출 합계</div><div class="value">${formatMoney(summary.plannedExpense)}</div></div>
           <div class="row"><div class="label">예산 내 여유 금액</div><div class="value">${formatMoney(summary.spare)}</div></div>
@@ -1132,6 +1165,7 @@
           ? 'card'
           : 'actual';
 
+      const badgeText = getStatusLabel(item.status);
       const sub = item.subcategory ? ` · ${item.subcategory}` : '';
       const actions = [];
       actions.push(`<button class="small-btn" onclick="openEditItem('${item.id}')">수정</button>`);
@@ -1158,7 +1192,7 @@
               <div class="item-desc">${item.memo || '메모 없음'} · ${item.date || ''}</div>
             </div>
             <div>
-              <div class="badge ${badgeClass}">${item.status}</div>
+              <div class="badge ${badgeClass}">${badgeText}</div>
               <div class="value" style="margin-top:8px; text-align:right;">${formatMoney(item.amount)}</div>
             </div>
           </div>
@@ -1187,6 +1221,8 @@
       const planVariable = sumBy(plans.filter(i => i.type === '변동지출'), i => i.amount);
 
       document.getElementById('page-ledger').innerHTML = `
+        ${renderPeriodNavigator()}
+
         <div class="card">
           <div class="section-head">
             <div class="section-title">내역</div>
@@ -1228,7 +1264,7 @@
         </div>
 
         ${buildLedgerSection('계획', plans, '등록된 계획이 없어요.')}
-        ${buildLedgerSection('계획된 지출', plannedExpense, '계획된 지출이 없어요.')}
+        ${buildLedgerSection('카드값', plannedExpense, '카드값 내역이 없어요.')}
         ${buildLedgerSection('현황 · 수입', actualIncome, '수입 현황이 없어요.')}
         ${buildLedgerSection('현황 · 저축/투자', actualSaving, '저축/투자 현황이 없어요.')}
         ${buildLedgerSection('현황 · 고정지출', actualFixed, '고정지출 현황이 없어요.')}
@@ -1320,14 +1356,24 @@
       const budgetRows = topCategoryUsage(meta.key);
 
       document.getElementById('page-reports').innerHTML = `
+        ${renderPeriodNavigator()}
+
         <div class="card">
           <div class="section-title">리포트</div>
           <div class="report-grid" style="margin-top:12px;">
             <div class="card" style="margin:0; box-shadow:none; border:1px solid var(--line);"><div class="label">실제 지출</div><div class="report-num">${formatMoney(summary.actualExpense)}</div></div>
-            <div class="card" style="margin:0; box-shadow:none; border:1px solid var(--line);"><div class="label">계획된 지출</div><div class="report-num">${formatMoney(summary.plannedExpense)}</div></div>
+            <div class="card" style="margin:0; box-shadow:none; border:1px solid var(--line);"><div class="label">카드값 + 계획 변동</div><div class="report-num">${formatMoney(summary.plannedExpense)}</div></div>
             <div class="card" style="margin:0; box-shadow:none; border:1px solid var(--line);"><div class="label">저축/투자</div><div class="report-num">${formatMoney(summary.saving)}</div></div>
             <div class="card" style="margin:0; box-shadow:none; border:1px solid var(--line);"><div class="label">예산 여유</div><div class="report-num">${formatMoney(summary.spare)}</div></div>
           </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">지출 요약</div>
+          <div class="row"><div class="label">실제 지출</div><div class="value">${formatMoney(summary.actualExpense)}</div></div>
+          <div class="row"><div class="label">카드값</div><div class="value">${formatMoney(summary.plannedCardExpense)}</div></div>
+          <div class="row"><div class="label">계획된 변동지출</div><div class="value">${formatMoney(summary.plannedVariableExpense)}</div></div>
+          <div class="row"><div class="label">예산 내 여유 금액</div><div class="value">${formatMoney(summary.spare)}</div></div>
         </div>
 
         <div class="card">
